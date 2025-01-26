@@ -1,15 +1,15 @@
-const Holidays = window.Holidays.default
+const Holidays = window.Holidays.default;
 
-const hd = new Holidays('JP', '', '',{types: ['public']}); // 日本の祝日情報を取得
+const holidayCountries =  Object.keys((new Holidays()).getCountries())
+const holidayHolders = Object.fromEntries(
+    holidayCountries.map((country) => [country, new Holidays(country, '', '', { types: ['public'] })])
+  );
 let currentDate = new Date();
-
 function renderCalendar(date) {
-    // 現在の年と月を表示
     const monthYearEl = document.getElementById('month-year');
     monthYearEl.textContent = date.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long' });
     const calendarEl = document.getElementById('calendar');
-    calendarEl.innerHTML = ''; // 古いカレンダーをクリア
-    if (!calendarEl) return; // nullチェック
+    calendarEl.innerHTML = '';
 
     const month = date.getMonth();
     const year = date.getFullYear();
@@ -18,7 +18,6 @@ function renderCalendar(date) {
     const lastDay = new Date(year, month + 1, 0);
     const daysInMonth = lastDay.getDate();
 
-    // 曜日ラベル
     const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
     weekdays.forEach(day => {
         const dayEl = document.createElement('div');
@@ -26,47 +25,43 @@ function renderCalendar(date) {
         calendarEl.appendChild(dayEl);
     });
 
-    // 最初の日までの空白を追加
     const emptyDays = firstDay.getDay();
     for (let i = 0; i < emptyDays; i++) {
         const emptyDiv = document.createElement('div');
         calendarEl.appendChild(emptyDiv);
     }
 
-    // 祝日を保存するための配列
     const holidaysInMonth = [];
 
+    const timezoneOffset = currentDate.getTimezoneOffset()
+    const tzOffset = (-timezoneOffset+11*60) * 60000 // offset for UTC-11
     for (let i = 1; i <= daysInMonth; i++) {
-        const dayDate = new Date(year, month, i);
+        const dayDate = new Date((new Date(year,month, i)).getTime() + tzOffset)
         const dayEl = document.createElement('div');
         dayEl.textContent = i.toString();
 
         const dayOfWeek = dayDate.getDay();
-        const holiday = hd.isHoliday(dayDate);
+        let isHoliday = false;
 
-        // 祝日があるかチェック
-        if (holiday) {
-            holidaysInMonth.push(`${i}日 ${holiday[0].name || '祝日'}`); // 祝日名がundefinedの場合の処理
+        // 各国の祝日をチェック
+        for (const [countryCode, holder] of Object.entries(holidayHolders)) {
+            const holiday = holder.isHoliday(dayDate);
+            if (holiday) {
+                isHoliday = true;
+                holidaysInMonth.push(`${i}日 ${holiday[0].name || '祝日'} (${countryCode})`);
+            }
         }
 
-        // 色の設定
-        if (dayOfWeek === 0 || holiday) {
+        if (dayOfWeek === 0 || isHoliday) {
             dayEl.classList.add('sunday', 'holiday');
         } else if (dayOfWeek === 6) {
             dayEl.classList.add('saturday');
         }
-
         calendarEl.appendChild(dayEl);
     }
 
-    // 祝日を表示
-    let holidaysEl = document.getElementById('holidays');
-    if (!holidaysEl) {
-        holidaysEl = document.createElement('div');
-        holidaysEl.id = 'holidays';
-        calendarEl.parentNode.appendChild(holidaysEl); // カレンダーの外に追加
-    }
-    holidaysEl.innerHTML = '当月の祝日：<br>' + holidaysInMonth.join('<br>');
+    const holidaysEl = document.getElementById('holidays');
+    holidaysEl.innerHTML = holidaysInMonth.join('<br>');
 }
 
 // 月を移動するボタンの設定
@@ -77,8 +72,6 @@ function setupButtons() {
             currentDate.setMonth(currentDate.getMonth() - 1);
             renderCalendar(currentDate);
         });
-    } else {
-        console.error('Previous month button not found');
     }
 
     const nextButton = document.getElementById('next-month');
@@ -87,11 +80,9 @@ function setupButtons() {
             currentDate.setMonth(currentDate.getMonth() + 1);
             renderCalendar(currentDate);
         });
-    } else {
-        console.error('Next month button not found');
     }
 }
 
 // 初期化
-setupButtons(); // ボタンの設定を呼び出す
+setupButtons();
 renderCalendar(currentDate);
