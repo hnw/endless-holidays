@@ -24,29 +24,44 @@ function renderCalendar(date) {
         calendarEl.appendChild(emptyDiv);
     }
 
-    const holidaysInMonth = [];
-
-    const timezoneOffset = currentDate.getTimezoneOffset()
-    const tzOffset = (-timezoneOffset+11*60) * 60000 // offset for UTC-11
+    const holidaysInMonth = {};
+    for (const [countryCode, holder] of Object.entries(holidayHolders)) {
+        for (const holiday of holder.getHolidays(year)) {
+            const holidayDate = new Date(holiday.date);
+            const duration = Math.round((holiday.end.getTime()-holiday.start.getTime()) / 86400000)
+            for (let i = 1; i <= duration; i++) {
+                const date = holidayDate.getDate();
+                if (holidayDate >= firstDay && holidayDate <= lastDay) {
+                    if (holidaysInMonth[date] == null) {
+                        holidaysInMonth[date] = {};
+                    }
+                    if (holidaysInMonth[date][countryCode] == null) {
+                        holidaysInMonth[date][countryCode] = [];
+                    }
+                    holidaysInMonth[date][countryCode].push(holiday)
+                }
+                holidayDate.setDate(holidayDate.getDate()+1);
+            }
+        }
+    }
+    const holidayDetails = []
     for (let i = 1; i <= daysInMonth; i++) {
-        const dayDate = new Date((new Date(year,month, i)).getTime() + tzOffset)
+        const dayDate = new Date(year,month, i)
         const dayEl = document.createElement('div');
         dayEl.textContent = i.toString();
 
         const dayOfWeek = dayDate.getDay();
         let isHoliday = false;
 
-        // 各国の祝日をチェック
-        for (const [countryCode, holder] of Object.entries(holidayHolders)) {
-            const holiday = holder.isHoliday(dayDate);
-            if (holiday) {
-                isHoliday = true;
-                holidaysInMonth.push(`${i}日 ${holiday[0].name || '祝日'} (${countryCode})`);
-            }
-        }
-
-        if (isHoliday) {
+        if (holidaysInMonth[i]) {
             dayEl.classList.add('holiday');
+            const details = [];
+            for (const [countryCode, holidays] of Object.entries(holidaysInMonth[i])) {
+                for (const holiday of holidays) {
+                    details.push(`${i}日 ${holiday.name || '祝日'} (${countryCode})`)
+                }
+            }
+            holidayDetails[i] = details.join('</br>')
         }
         if (dayOfWeek === 0) {
             dayEl.classList.add('sunday');
@@ -57,7 +72,7 @@ function renderCalendar(date) {
     }
 
     const holidaysEl = document.getElementById('holidays');
-    holidaysEl.innerHTML = holidaysInMonth.join('<br>');
+    holidaysEl.innerHTML = holidayDetails.join('<br>');
 }
 
 // 月を移動するボタンの設定
