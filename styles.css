@@ -35,17 +35,31 @@ button:hover {
     background-color: #0056b3;
 }
 
-#calendar {
+#calendar, #calendar-header {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: 10px;
+    border-top: 1px solid #ccc;
 }
 
-.day {
-    padding: 20px;
-    border: 1px solid #ccc;
+#calendar {
+    border-bottom: 1px solid #ccc;
+}
+
+#calendar div, #calendar-header div {
+    padding: 5px;
+    border: none;
     position: relative;
     text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: "Arial Black", sans-serif;
+    font-size: 1.3em;
+}
+
+#calendar div {
+    font-size: 2em;
 }
 
 .saturday {

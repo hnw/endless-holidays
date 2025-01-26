@@ -8,10 +8,22 @@
 </head>
 <body>
     <div id="calendar-container">
-        <div id="month-year"></div>
-        <button id="prev-month">前月</button>
-        <button id="next-month">翌月</button>
-        <div id="calendar"></div>
+        <div style="display: flex; justify-content: center; align-items: center;">
+            <button id="prev-month" style="margin-right: 10px;">前月</button>
+            <div id="month-year" style="margin: 0 20px;"></div>
+            <button id="next-month" style="margin-left: 10px;">翌月</button>
+        </div>
+        <div id="calendar-header">
+            <div class="sunday">SUN</div>
+            <div class="weekday">MON</div>
+            <div class="weekday">TUE</div>
+            <div class="weekday">WED</div>
+            <div class="weekday">THU</div>
+            <div class="weekday">FRI</div>
+            <div class="saturday">SAT</div>
+        </div>
+        <div id="calendar">
+        </div>
         <div id="holidays"></div>
     </div>
     <script src="https://unpkg.com/date-holidays/dist/umd.min.js" type="text/javascript" charset="utf-8"></script>    

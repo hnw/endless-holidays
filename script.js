@@ -18,13 +18,6 @@ function renderCalendar(date) {
     const lastDay = new Date(year, month + 1, 0);
     const daysInMonth = lastDay.getDate();
 
-    const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
-    weekdays.forEach(day => {
-        const dayEl = document.createElement('div');
-        dayEl.textContent = day;
-        calendarEl.appendChild(dayEl);
-    });
-
     const emptyDays = firstDay.getDay();
     for (let i = 0; i < emptyDays; i++) {
         const emptyDiv = document.createElement('div');
@@ -52,8 +45,11 @@ function renderCalendar(date) {
             }
         }
 
-        if (dayOfWeek === 0 || isHoliday) {
-            dayEl.classList.add('sunday', 'holiday');
+        if (isHoliday) {
+            dayEl.classList.add('holiday');
+        }
+        if (dayOfWeek === 0) {
+            dayEl.classList.add('sunday');
         } else if (dayOfWeek === 6) {
             dayEl.classList.add('saturday');
         }
