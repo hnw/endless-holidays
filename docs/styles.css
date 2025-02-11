@@ -60,6 +60,7 @@ button:hover {
 
 #calendar div {
     font-size: 2em;
+    font-weight: bold;
 }
 
 .saturday {
@@ -68,6 +69,17 @@ button:hover {
 
 .sunday, .holiday {
     color: red;
+}
+
+.today.sunday, .today.holiday,.today.holiday.saturday {
+    background-color: rgba(255, 0, 0, 0.2);
+}
+.today.saturday {
+    background-color: rgba(0, 0, 255, 0.2);
+}
+.today {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 50%;
 }
 
 #holidays-container {
