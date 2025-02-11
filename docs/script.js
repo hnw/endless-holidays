@@ -67,7 +67,7 @@ function renderCalendar(date) {
             const details = [];
             for (const [countryCode, holidays] of Object.entries(holidaysInMonth[i])) {
                 for (const holiday of holidays) {
-                    details.push(`${holiday.name || '祝日'} (${countryCode})`)
+                    details.push(`${holiday.name || '祝日'} (<span class="fi fi-${countryCode.toLowerCase()}"></span>${countryCode})`)
                 }
             }
             holidayDetails[i] = details
