@@ -3,15 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>世界のカレンダー</title>
+    <title>Everyday holiday calendar</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div id="calendar-container">
         <div style="display: flex; justify-content: center; align-items: center;">
-            <button id="prev-month" style="margin-right: 10px;">前月</button>
+            <button id="prev-month" style="margin-right: 10px;">
+                <svg width="16" height="10">
+                    <polygon points="13,0 13,10 1,5" style="fill:white"/>
+                </svg>
+            </button>
             <div id="month-year" style="margin: 0 20px;"></div>
-            <button id="next-month" style="margin-left: 10px;">翌月</button>
+            <button id="next-month" style="margin-left: 10px;">
+                <svg width="16" height="10">
+                    <polygon points="3,0 3,10 15,5" style="fill:white"/>
+                </svg>
+            </button>
         </div>
         <div id="calendar-header">
             <div class="sunday">SUN</div>
