@@ -29,8 +29,11 @@ function renderCalendar(date) {
     const holidaysInMonth = {};
     for (const [countryCode, holder] of Object.entries(holidayHolders)) {
         for (const holiday of holder.getHolidays(year)) {
-            const holidayDate = new Date(holiday.date);
+            const holidayDate = new Date(`${holiday.date.slice(0, 10)}T00:00:00`);
             const duration = Math.round((holiday.end.getTime()-holiday.start.getTime()) / 86400000)
+            if (holidayDate > lastDay || (duration == 1 && holidayDate < firstDay)) {
+                continue
+            }
             for (let i = 1; i <= duration; i++) {
                 const date = holidayDate.getDate();
                 if (holidayDate >= firstDay && holidayDate <= lastDay) {
