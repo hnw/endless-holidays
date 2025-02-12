@@ -15,7 +15,7 @@ body {
 
 #month-year {
     font-weight: bold;
-    font-size: 1.2em;
+    font-size: 1.5em;
     text-align: center;
 }
 
@@ -37,7 +37,7 @@ button:hover {
 #calendar, #calendar-header {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 4px;
+    gap: 2px;
     border-top: 1px solid #ccc;
 }
 
@@ -53,14 +53,14 @@ button:hover {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-family: "Arial Black", sans-serif;
-    font-size: 0.75em;
+    font-family: Superclarendon, 'Bookman Old Style', 'URW Bookman', 'URW Bookman L', 'Georgia Pro', Georgia, serif;
+    font-size: 0.8em;
     font-weight: bold;
 }
 
 #calendar div {
     padding: 5px 1px;
-    font-size: 1.2em;
+    font-size: 1.5em;
 }
 
 .saturday {
