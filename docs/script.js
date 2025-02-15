@@ -3,11 +3,16 @@ const Holidays = window.Holidays.default;
 const holidayCountries =  Object.keys((new Holidays()).getCountries())
 const holidayHolders = Object.fromEntries(
     holidayCountries.map((country) => [country, new Holidays(country, '', '', { types: ['public'] })])
-  );
+);
+var language = (window.navigator.languages && window.navigator.languages[0]) ||
+window.navigator.language ||
+window.navigator.userLanguage ||
+window.navigator.browserLanguage;
 let currentDate = new Date();
+
 function renderCalendar(date) {
     const monthYearEl = document.getElementById('month-year');
-    monthYearEl.textContent = date.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long' });
+    monthYearEl.textContent = date.toLocaleDateString(language, { year: 'numeric', month: 'long' });
     const calendarEl = document.getElementById('calendar');
     const holidaysEl = document.getElementById('holidays');
     calendarEl.innerHTML = '';
@@ -67,15 +72,15 @@ function renderCalendar(date) {
             const details = [];
             for (const [countryCode, holidays] of Object.entries(holidaysInMonth[i])) {
                 for (const holiday of holidays) {
-                    details.push(`${holiday.name || '祝日'} (<span class="fi fi-${countryCode.toLowerCase()}"></span>${countryCode})`)
+                    details.push(`${holiday.name || 'Holiday'} (<span class="fi fi-${countryCode.toLowerCase()}"></span>${countryCode})`)
                 }
             }
             holidayDetails[i] = details
         }
         const showHolidays = () => {
-            const holidayText = holidayDetails[i]?.join('</li><li>') || '祝日ではありません';
+            const holidayText = holidayDetails[i]?.join('</li><li>') || 'No holidays';
             const holidaysEl = document.getElementById('holidays');
-            const monthDay = dayDate.toLocaleDateString('ja-JP', { month: 'long', day: 'numeric' });
+            const monthDay = dayDate.toLocaleDateString(language, { month: 'long', day: 'numeric' });
             holidaysEl.innerHTML = `${monthDay}:<ul><li>${holidayText}</li></ul>`;
         }
         dayEl.addEventListener('click', showHolidays);
