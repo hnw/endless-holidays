@@ -1,30 +1,34 @@
 const Holidays = window.Holidays.default;
 
-const holidayCountries =  Object.keys((new Holidays()).getCountries())
+const holidayCountries =  (new Holidays()).getCountries()
 const holidayHolders = Object.fromEntries(
-    holidayCountries.map((country) => [country, new Holidays(country, '', '', { types: ['public'] })])
+  Object.keys(holidayCountries).map((country) => [country, new Holidays(country, '', '', { types: ['public'] })])
 );
+
 var language = (window.navigator.languages && window.navigator.languages[0]) ||
 window.navigator.language ||
 window.navigator.userLanguage ||
 window.navigator.browserLanguage;
 let currentDate = new Date();
 
-function renderCalendar(date) {
+function renderCalendar(year, month, country) {
+      const countryEl = document.getElementById('country')
+    if (!holidayHolders[country]) {
+      country = ''
+      countryEl.innerHTML = ''
+    } else {
+      countryEl.innerHTML = `<span class="fi fi-${country.toLowerCase()}"></span>${holidayCountries[country]}`
+    }
+    const firstDay = new Date(year, month - 1, 1);
+    const lastDay = new Date(year, month, 0);
+    const daysInMonth = lastDay.getDate();
+
     const monthYearEl = document.getElementById('month-year');
-    monthYearEl.textContent = date.toLocaleDateString(language, { year: 'numeric', month: 'long' });
+    monthYearEl.textContent = firstDay.toLocaleDateString(language, { year: 'numeric', month: 'long' });
     const calendarEl = document.getElementById('calendar');
     const holidaysEl = document.getElementById('holidays');
     calendarEl.innerHTML = '';
     holidaysEl.innerHTML = ''
-
-    const month = date.getMonth();
-    const year = date.getFullYear();
-
-    const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
-    const daysInMonth = lastDay.getDate();
-
     const emptyDays = firstDay.getDay();
     for (let i = 0; i < emptyDays; i++) {
         const emptyDiv = document.createElement('div');
@@ -32,7 +36,10 @@ function renderCalendar(date) {
     }
 
     const holidaysInMonth = {};
-    for (const [countryCode, holder] of Object.entries(holidayHolders)) {
+    for (const [cc, holder] of Object.entries(holidayHolders)) {
+        if (country && country !== cc) {
+            continue
+        }
         for (const holiday of holder.getHolidays(year)) {
             const holidayDate = new Date(`${holiday.date.slice(0, 10)}T00:00:00`);
             const duration = Math.round((holiday.end.getTime()-holiday.start.getTime()) / 86400000)
@@ -45,10 +52,10 @@ function renderCalendar(date) {
                     if (holidaysInMonth[date] == null) {
                         holidaysInMonth[date] = {};
                     }
-                    if (holidaysInMonth[date][countryCode] == null) {
-                        holidaysInMonth[date][countryCode] = [];
+                    if (holidaysInMonth[date][cc] == null) {
+                        holidaysInMonth[date][cc] = [];
                     }
-                    holidaysInMonth[date][countryCode].push(holiday)
+                    holidaysInMonth[date][cc].push(holiday)
                 }
                 holidayDate.setDate(holidayDate.getDate()+1);
             }
@@ -56,7 +63,7 @@ function renderCalendar(date) {
     }
     const holidayDetails = []
     for (let i = 1; i <= daysInMonth; i++) {
-        const dayDate = new Date(year, month, i)
+        const dayDate = new Date(year, month - 1, i)
         const dayEl = document.createElement('div');
         dayEl.textContent = i.toString();
 
@@ -70,9 +77,13 @@ function renderCalendar(date) {
         if (holidaysInMonth[i]) {
             dayEl.classList.add('holiday');
             const details = [];
-            for (const [countryCode, holidays] of Object.entries(holidaysInMonth[i])) {
+            for (const [cc, holidays] of Object.entries(holidaysInMonth[i])) {
                 for (const holiday of holidays) {
-                    details.push(`${holiday.name || 'Holiday'} (<span class="fi fi-${countryCode.toLowerCase()}"></span>${countryCode})`)
+                    let text = `${holiday.name || 'Holiday'}`
+                    if (!country) {
+                        text = `${text} (<span class="fi fi-${cc.toLowerCase()}"></span><a href="#year=${year}&month=${month}&country=${cc}">${cc}</a>)`
+                    }
+                    details.push(text)
                 }
             }
             holidayDetails[i] = details
@@ -101,20 +112,44 @@ function setupButtons() {
     const prevButton = document.getElementById('prev-month');
     if (prevButton) {
         prevButton.addEventListener('click', () => {
-            currentDate.setMonth(currentDate.getMonth() - 1);
-            renderCalendar(currentDate);
+            const { year, month, country } = getParamsFromHash();
+            updateHash(year, month - 1, country)
+            renderCalendar(year, month - 1, country)
         });
     }
 
     const nextButton = document.getElementById('next-month');
     if (nextButton) {
         nextButton.addEventListener('click', () => {
-            currentDate.setMonth(currentDate.getMonth() + 1);
-            renderCalendar(currentDate);
+            const { year, month, country } = getParamsFromHash();
+            updateHash(year, month + 1, country)
+            renderCalendar(year, month + 1, country)
         });
     }
 }
 
+// ハッシュから年・月・国を取得
+function getParamsFromHash() {
+    const hash = window.location.hash.substring(1); // '#'を取り除く
+    const params = new URLSearchParams(hash);
+    const year = parseInt(params.get('year')) || new Date().getFullYear();
+    const month = parseInt(params.get('month')) || (new Date().getMonth() + 1);
+    const country = params.get('country') || '';
+    return { year, month, country };
+}
+
+// ハッシュを更新
+function updateHash(year, month, country) {
+    const date = new Date(year, month - 1, 1);
+    window.location.hash = `year=${date.getFullYear()}&month=${date.getMonth()+1}&country=${country}`;
+}
+
+window.addEventListener('hashchange', () => {
+    const { year, month, country } = getParamsFromHash();
+    renderCalendar(year, month, country);
+});
+
 // 初期化
 setupButtons();
-renderCalendar(currentDate);
+const { year, month, country } = getParamsFromHash();
+renderCalendar(year, month, country);

@@ -13,6 +13,10 @@ body {
     background-color: #f9f9f9;
 }
 
+#country {
+    font-size: 1em;
+}
+
 #month-year {
     font-weight: bold;
     font-size: 1.5em;
