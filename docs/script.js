@@ -149,4 +149,31 @@ window.addEventListener('hashchange', () => {
 // 初期化
 setupButtons();
 const { year, month, country } = getParamsFromHash();
+function updateBackButton(country) {
+    let backButton = document.getElementById("back-button");
+    if (country) {
+        if (!backButton) {
+            backButton = document.createElement("button");
+            backButton.id = "back-button";
+            backButton.textContent = "🌍";
+            backButton.title = "Back";
+            backButton.addEventListener("mouseenter", () => {
+                backButton.textContent = "Back";
+            });
+            backButton.addEventListener("mouseleave", () => {
+                backButton.textContent = "🌍";
+            });
+            backButton.addEventListener("click", () => {
+                const { year, month } = getParamsFromHash();
+                updateHash(year, month, '');
+                renderCalendar(year, month, '');
+            });
+            document.getElementById("calendar-container").appendChild(backButton);
+        }
+    } else {
+        if (backButton) {
+            backButton.remove();
+        }
+    }
+}
 renderCalendar(year, month, country);
