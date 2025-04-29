@@ -12,17 +12,16 @@ window.navigator.browserLanguage;
 let currentDate = new Date();
 
 function renderCalendar(year, month, country) {
-      const countryEl = document.getElementById('country')
+    const countryEl = document.getElementById('country')
     if (!holidayHolders[country]) {
-      country = ''
-      countryEl.innerHTML = ''
+        country = ''
+        countryEl.innerHTML = '&#127760; All Country'
     } else {
-      countryEl.innerHTML = `<span class="fi fi-${country.toLowerCase()}"></span>${holidayCountries[country]}`
+        countryEl.innerHTML = `<span class="fi fi-${country.toLowerCase()}"></span>${holidayCountries[country]}`
     }
     const firstDay = new Date(year, month - 1, 1);
     const lastDay = new Date(year, month, 0);
     const daysInMonth = lastDay.getDate();
-
     const monthYearEl = document.getElementById('month-year');
     monthYearEl.textContent = firstDay.toLocaleDateString(language, { year: 'numeric', month: 'long' });
     const calendarEl = document.getElementById('calendar');
@@ -34,7 +33,6 @@ function renderCalendar(year, month, country) {
         const emptyDiv = document.createElement('div');
         calendarEl.appendChild(emptyDiv);
     }
-
     const holidaysInMonth = {};
     for (const [cc, holder] of Object.entries(holidayHolders)) {
         if (country && country !== cc) {
@@ -101,10 +99,9 @@ function renderCalendar(year, month, country) {
         }
         calendarEl.appendChild(dayEl);
     }
-
-    //const holidaysEl = document.getElementById('holidays');
-    //holidaysEl.innerHTML = holidayDetails.join('<br>');
-    //holidaysEl.innerHTML = ''
+    if (country) {
+        holidaysEl.innerHTML = holidayDetails.map((el,i) => el ? `${i} ${el}` : el).filter((el) => el).join('<br>')
+    }
 }
 
 // 月を移動するボタンの設定
