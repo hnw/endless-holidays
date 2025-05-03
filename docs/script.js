@@ -21,10 +21,11 @@ function renderCalendar(year, month, country, lang) {
     const countryEl = document.getElementById('country')
     if (!holidayHolders[country]) {
       country = ''
-      while (countryEl.childNodes.length >= 2) {
+    }
+    while (countryEl.childNodes.length >= 2) {
         countryEl.removeChild(countryEl.lastChild);
-      }
-    } else {
+    }
+    if (holidayHolders[country]) {
       const holidayCountries = (new Holidays()).getCountries(lang)
       if (countryEl.childNodes.length <= 1) {
           countryEl.insertAdjacentHTML("beforeend", `<li><span class="fi fi-${country.toLowerCase()}"></span>${holidayCountries[country]}</li>`)
@@ -90,7 +91,7 @@ function renderCalendar(year, month, country, lang) {
                 for (const holiday of holidays) {
                     let text = `${holiday.name || 'Holiday'}`
                     if (!country) {
-                        text = `${text} (<span class="fi fi-${cc.toLowerCase()}"></span><a href="#year=${year}&month=${month}&country=${cc}">${cc}</a>)`
+                        text = `${text} (<span class="fi fi-${cc.toLowerCase()}"></span><a href="#${getHashString(year,month,cc,lang)}">${cc}</a>)`
                     }
                     details.push(text)
                 }
@@ -153,8 +154,11 @@ function getParamsFromHash() {
 // ハッシュを更新
 function updateHash(year, month, country, lang) {
   const date = new Date(year, month - 1, 1);
-  let hashStr = `year=${date.getFullYear()}&month=${date.getMonth()+1}&country=${country}&lang=${lang}`;
-  window.location.hash = hashStr;
+  window.location.hash = getHashString(date.getFullYear(), date.getMonth()+1, country, lang);
+}
+
+function getHashString(year, month, country, lang) {
+  return `year=${year}&month=${month}&country=${country}&lang=${lang}`
 }
 
 window.addEventListener('hashchange', () => {
