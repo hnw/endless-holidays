@@ -2,8 +2,9 @@ const Holidays = window.Holidays.default;
 const currentTime = new Date();
 const today = new Date(currentTime.getFullYear(), currentTime.getMonth(), currentTime.getDate());
 
+const holidayCountries = (new Holidays()).getCountries('en')
 const holidayHolders = Object.fromEntries(
-  Object.keys((new Holidays()).getCountries()).map((country) => [country, new Holidays(country, '', '', { types: ['public'] })])
+  Object.keys(holidayCountries).map((country) => [country, new Holidays(country, '', '', { types: ['public'] })])
 );
 
 var browserLanguage = (window.navigator.languages && window.navigator.languages[0]) ||
@@ -26,7 +27,6 @@ function renderCalendar(year, month, country, lang) {
         countryEl.removeChild(countryEl.lastChild);
     }
     if (holidayHolders[country]) {
-      const holidayCountries = (new Holidays()).getCountries(lang)
       if (countryEl.childNodes.length <= 1) {
           countryEl.insertAdjacentHTML("beforeend", `<li><span class="fi fi-${country.toLowerCase()}"></span>${holidayCountries[country]}</li>`)
       }
